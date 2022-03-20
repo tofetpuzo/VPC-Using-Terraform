@@ -1,5 +1,5 @@
 provider "aws" {
-  region     = "us-east-1"
+  region = "us-east-1"
 
 }
 
@@ -50,10 +50,10 @@ resource "aws_route_table" "prod-route-tab" {
 
 // 4. Create a subnet
 resource "aws_subnet" "subnet-01" {
-  vpc_id     = aws_vpc.first-vpc.id
-  cidr_block = "10.0.1.0/24"
+  vpc_id            = aws_vpc.first-vpc.id
+  cidr_block        = "10.0.1.0/24"
   availability_zone = "us-east-1a"
-  
+
   tags = {
     Name = "prod-subnet"
   }
@@ -69,20 +69,42 @@ resource "aws_route_table_association" "assoc-route-tab" {
 
 
 //6. Create Security Group to allocate port 20, 80, 443
-resource "aws_security_group" "allow_tls" {
-  name        = "allow_tls"
-  description = "Allow TLS inbound traffic"
+resource "aws_security_group" "allow_web" {
+  name        = "allow_web_traffic"
+  description = "Allow Web traffic"
   vpc_id      = aws_vpc.first-vpc.id
 
+  // This allows inbound rules
   ingress {
-    description      = "TLS from VPC"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = [aws_vpc.first-vpc.cidr_block]
+    description = "HTTPS Traffic from VPC"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    // Our work id
+    cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
   }
 
+
+  ingress {
+    description = "HTTPS Traffic from VPC"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    // Our work id
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
+  }
+
+  ingress {
+    description = "HTTPS Traffic from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    // Our work id
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
+  }
   egress {
     from_port        = 0
     to_port          = 0
@@ -92,7 +114,7 @@ resource "aws_security_group" "allow_tls" {
   }
 
   tags = {
-    Name = "allow_tls"
+    Name = "allow_web"
   }
 }
 
