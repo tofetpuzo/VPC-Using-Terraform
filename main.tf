@@ -3,7 +3,6 @@ provider "aws" {
 
 }
 
-
 resource "aws_instance" "server-deployment-001" {
   ami           = "ami-04505e74c0741db8d"
   instance_type = "t2.micro"
@@ -20,7 +19,6 @@ resource "aws_vpc" "first-vpc" {
   }
 }
 
-
 // 2. Create Internet Gateway
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.first-vpc.id
@@ -31,18 +29,19 @@ resource "aws_internet_gateway" "gw" {
 }
 
 // 3. Create Custom Route table
-resource "aws_route_table" "route-tab" {
+resource "aws_route_table" "prod-route-tab" {
   vpc_id = aws_vpc.first-vpc.id
 
   route {
-    cidr_block = "10.0.1.0/24"
+    cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
 
   route {
     ipv6_cidr_block        = "::/0"
-    egress_only_gateway_id = aws_egress_only_internet_gateway.gw.id
+    egress_only_gateway_id = aws_internet_gateway.gw.id
   }
+
   tags = {
     Name = "prod-route-tab"
   }
@@ -53,7 +52,8 @@ resource "aws_route_table" "route-tab" {
 resource "aws_subnet" "subnet-01" {
   vpc_id     = aws_vpc.first-vpc.id
   cidr_block = "10.0.1.0/24"
-
+  availability_zone = "us-east-1a"
+  
   tags = {
     Name = "prod-subnet"
   }
@@ -64,7 +64,7 @@ resource "aws_subnet" "subnet-01" {
 //5. Associate subnet with Route Table
 resource "aws_route_table_association" "assoc-route-tab" {
   subnet_id      = aws_subnet.subnet-01.id
-  route_table_id = aws_route_table.route-tab.id
+  route_table_id = aws_route_table.prod-route-tab.id
 }
 
 
