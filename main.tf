@@ -85,7 +85,7 @@ resource "aws_security_group" "allow_web" {
     ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
   }
 
-
+// This allows traffic into the server
   ingress {
     description = "HTTPS Traffic from VPC"
     from_port   = 80
@@ -105,6 +105,8 @@ resource "aws_security_group" "allow_web" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
   }
+
+  // This allowing the server to talk to everyone on the vpc
   egress {
     from_port        = 0
     to_port          = 0
