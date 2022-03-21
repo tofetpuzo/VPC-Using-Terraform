@@ -32,9 +32,9 @@ resource "aws_route_table" "prod-route-tab" {
   }
 
 
-  route {
+  /* route {
     ipv6_cidr_block = "::/0"
-  }
+  } */
 
   tags = {
     Name = "prod-route-tab"
