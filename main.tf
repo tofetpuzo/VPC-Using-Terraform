@@ -3,12 +3,6 @@ provider "aws" {
 
 }
 
-resource "aws_instance" "server-deployment-001" {
-  ami           = "ami-04505e74c0741db8d"
-  instance_type = "t2.micro"
-
-
-}
 
 // 1. Create vpc
 resource "aws_vpc" "first-vpc" {
@@ -37,9 +31,9 @@ resource "aws_route_table" "prod-route-tab" {
     gateway_id = aws_internet_gateway.gw.id
   }
 
+
   route {
-    ipv6_cidr_block        = "::/0"
-    egress_only_gateway_id = aws_internet_gateway.gw.id
+    ipv6_cidr_block = "::/0"
   }
 
   tags = {
@@ -81,38 +75,36 @@ resource "aws_security_group" "allow_web" {
     to_port     = 443
     protocol    = "tcp"
     // Our work id
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   // This allows traffic into the server
   ingress {
-    description = "HTTPS Traffic from VPC"
+    description = "HTTP Traffic from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
     // Our work id
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
+
   }
 
   ingress {
-    description = "HTTPS Traffic from VPC"
+    description = "SSH"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
     // Our work id
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   // This allowing the server to talk to everyone on the vpc
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+
   }
 
   tags = {
@@ -139,8 +131,8 @@ resource "aws_eip" "one" {
   vpc                       = true
   network_interface         = aws_network_interface.web-server-nic.id
   associate_with_private_ip = "10.0.1.50"
-  depends_on                = aws_internet_gateway.gw
-  key_name                  = "temi-key"
+  depends_on                = [aws_internet_gateway.gw]
+
 
 
 
@@ -150,9 +142,10 @@ resource "aws_eip" "one" {
 //9. Create Ubuntu server and install/enable apache2
 
 resource "aws_instance" "web-server-instance" {
-  ami               = "ami-0fb653ca2d3203ac1"
+  ami               = "ami-04505e74c0741db8d"
   instance_type     = "t2.micro"
   availability_zone = "us-east-1a"
+  key_name          = "main-key"
 
   network_interface {
     device_index         = 0
@@ -164,10 +157,12 @@ resource "aws_instance" "web-server-instance" {
               sudo apt update -y
               sudo apt install apache2 -y
               sudo systemctl start start apcahe2
-              sudo bash -c 'echo this is my server let us play >> /var/www/html/index.html'
+              sudo bash -c 'echo this is my server let us play > /var/www/html/index.html'
               EOF
 
-
+  tags = {
+    Name = "web-server"
+  }
 
 
 
