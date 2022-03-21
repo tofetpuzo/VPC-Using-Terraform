@@ -85,7 +85,7 @@ resource "aws_security_group" "allow_web" {
     ipv6_cidr_blocks = [aws_vpc.first-vpc.ipv6_cidr_block]
   }
 
-// This allows traffic into the server
+  // This allows traffic into the server
   ingress {
     description = "HTTPS Traffic from VPC"
     from_port   = 80
@@ -134,13 +134,41 @@ resource "aws_network_interface" "web-server-nic" {
   } */
 }
 
-
 //8. Assign an elastic IP to the network created in step 7
 resource "aws_eip" "one" {
   vpc                       = true
   network_interface         = aws_network_interface.web-server-nic.id
   associate_with_private_ip = "10.0.1.50"
+  depends_on                = aws_internet_gateway.gw
+  key_name                  = "temi-key"
+
+
+
 }
 
 
 //9. Create Ubuntu server and install/enable apache2
+
+resource "aws_instance" "web-server-instance" {
+  ami               = "ami-0fb653ca2d3203ac1"
+  instance_type     = "t2.micro"
+  availability_zone = "us-east-1a"
+
+  network_interface {
+    device_index         = 0
+    network_interface_id = aws_network_interface.web-server-nic.id
+
+  }
+  user_data = <<-EOF
+              #!/bin/bash
+              sudo apt update -y
+              sudo apt install apache2 -y
+              sudo systemctl start start apcahe2
+              sudo bash -c 'echo this is my server let us play >> /var/www/html/index.html'
+              EOF
+
+
+
+
+
+}
