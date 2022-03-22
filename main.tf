@@ -1,7 +1,5 @@
 provider "aws" {
   region = "us-east-1"
-  access_key = "AKIAUESPCBEJSABHBMDV"
-  secret_key = "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"
 
 }
 
@@ -21,7 +19,7 @@ variable "subnet-prefix" {
    /* what terraform is going to give this variable if we dont actually pass in a value for this variable  */
   //default = "10.0.6.0/23" if user does not assign this variable then terrafrom can you this
   /* A type constraints on variables so that when a user enters in a value, we can make sure that they enter in the proper type for this varibel */
-  //type = String
+  //type = string
   
 }
 
