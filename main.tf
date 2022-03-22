@@ -1,7 +1,30 @@
 provider "aws" {
   region = "us-east-1"
+  access_key = "AKIAUESPCBEJSABHBMDV"
+  secret_key = "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"
 
 }
+
+// Uses cases: the main use case is extracting the public IP, that is going to get assigned to an elastic ip or a EC2 instance that gets created.
+
+// To get the value: You have to pass the aws_eip
+
+/* output "myserver_public_ip" {
+  value = aws_eip.one.public_ip 
+  
+} */
+
+/* defining a variable */
+variable "subnet-prefix" {
+  description = "cidr block for the subnet"
+  // Reference a variable in terraform : var.subnet-prefix
+   /* what terraform is going to give this variable if we dont actually pass in a value for this variable  */
+  //default = "10.0.6.0/23" if user does not assign this variable then terrafrom can you this
+  /* A type constraints on variables so that when a user enters in a value, we can make sure that they enter in the proper type for this varibel */
+  //type = String
+  
+}
+
 
 
 // 1. Create vpc
@@ -40,12 +63,12 @@ resource "aws_route_table" "prod-route-tab" {
     Name = "prod-route-tab"
   }
 }
-
+/* "10.0.1.0/24" */
 
 // 4. Create a subnet
 resource "aws_subnet" "subnet-01" {
   vpc_id            = aws_vpc.first-vpc.id
-  cidr_block        = "10.0.1.0/24"
+  cidr_block        = var.subnet-prefix
   availability_zone = "us-east-1a"
 
   tags = {
