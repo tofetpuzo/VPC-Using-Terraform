@@ -1,0 +1,5 @@
+terraform state list: All the reasources
+terraform state show (reasources) after running the above code
+If you want to destroy a specific reasource, you can easily specify the resource by using this code
+-> terraform destroy -target aws_instance.web-server-instance
+terraform apply -var "subnet-prefix= 10.0.1.100/24"

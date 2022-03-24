@@ -20,6 +20,8 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+.terraform.lock.hcl
+.terraform-provider-aws_v4.6.0_x5.exe/
 
 # Include override files you do wish to add to version control using negated pattern
 #
