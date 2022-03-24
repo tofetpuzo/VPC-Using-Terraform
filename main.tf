@@ -11,7 +11,7 @@ provider "aws" {
   value = aws_eip.one.public_ip 
   
 } */
-
+Hello
 /* defining a variable */
 variable "subnet-prefix" {
   description = "cidr block for the subnet"
